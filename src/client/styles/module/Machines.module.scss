@@ -1,0 +1,56 @@
+@import "../variables";
+
+.Item {
+  @apply flex flex-col p-0 bg-white rounded-t-md;
+  filter: drop-shadow(3px 3px 5px rgba(79, 79, 79, 0.1));
+
+  &:hover {
+    @apply cursor-pointer;
+  }
+
+  :global(img) {
+    @apply rounded-t-md;
+  }
+
+  .BoxInfo {
+    @apply w-full flex flex-col justify-start bg-white;
+
+    .BoxInfoMeta {
+      @apply flex w-full flex-col items-center gap-3 py-4 px-6;
+
+      .InfoMeta {
+        @apply flex flex-row w-full items-center gap-2;
+
+        span:last-child {
+          @apply min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex-1;
+        }
+      }
+    }
+  }
+
+  .BoxActions {
+    //@apply flex justify-between bg-dark4 z-10;
+
+    :global(div) {
+      @apply w-1/2 flex justify-center py-2 px-6 gap-2;
+
+      &:hover {
+        background: $color-geodetic-bg-primary;
+
+        :global(span) {
+          @apply text-white #{!important};
+        }
+
+        :global(span) {
+          :global(img) {
+            //@extend %icon-color-filter-white;
+          }
+        }
+      }
+    }
+
+    :global(div:first-child) {
+      @apply border-r border-b-0 border-t-0 border-l-0 border-solid border-white;
+    }
+  }
+}

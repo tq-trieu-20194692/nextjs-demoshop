@@ -1,0 +1,96 @@
+@import "variables";
+@import "functions";
+
+// Color
+$color-primary: #009B90;
+$color-bg-main-1: #01686F;
+$color-bg-main-2: #003731;
+$color-bg-main-3: #F89633;
+$color-state-success: #09B377;
+$color-state-warning: #F5C61D;
+$color-state-error: #EB5757;
+$color-text-dark-1: #172723;
+$color-text-dark-2: #4F4F4F;
+$color-text-dark-3: #BDBDBD;
+$color-text-dark-4: #F4F4F4;
+$color-text-dark-5: #969696;
+$color-main: #149388;
+$color-main-second: #009B90;
+$color-layout: #FFFFFF;
+$color-white: #FFFFFF;
+$color-text-main: #333333;
+$color-background-main: #009B90;
+$color-gray: #F4F4F4;
+$color-gray2: #4F4F4F;
+
+a {
+  text-decoration: none;
+}
+
+// Fix ant conflict with core-ui
+.ant-modal-mask {
+  z-index: 1031 !important;
+}
+
+.ant-modal-wrap {
+  z-index: 1032 !important;
+}
+
+.ant-drawer {
+  z-index: 1030 !important;
+}
+
+.ant-image-preview-mask {
+  z-index: 1030 !important;
+}
+
+.ant-message {
+  z-index: 1040 !important;
+}
+
+.anticon svg {
+  vertical-align: baseline !important;
+}
+
+.ant-btn-sm {
+  font-size: 0.813rem;
+}
+
+//@layer components {
+//  .grid-container {
+//    @apply grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6 xxl:grid-cols-4 3xl:gap-8;
+//  }
+//}
+
+.card-title-overflow {
+  .ant-card-head-title {
+    padding: 0.5rem 0;
+  }
+}
+
+.descriptions-view-no-border {
+  .ant-descriptions-view {
+    border: 0 !important;
+  }
+}
+
+.card-focus {
+  border: 1px solid $color-state-success;
+  background-color: $color-text-dark-4 !important;
+}
+
+.ant-button-copy {
+  padding: 0;
+  height: auto;
+
+  .ant-typography-copy {
+    margin: 0 !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+}
+
+.table-expanded-no-padding {
+  .ant-table-cell {
+    padding: 0 !important;
+  }
+}

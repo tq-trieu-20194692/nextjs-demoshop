@@ -1,0 +1,11 @@
+.idea
+_bash
+Dockerfile
+.dockerignore
+node_modules
+.yarn
+npm-debug.log
+README.md
+.next
+build
+.git

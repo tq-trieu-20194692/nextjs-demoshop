@@ -1,0 +1,18 @@
+// CoreUI
+@import "src/client/styles/coreui/style";
+
+//@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// ant.design
+@import "~antd/dist/reset.css";
+
+// client
+@import "../client/styles/index";
+
+// map
+@import '~@goongmaps/goong-js/dist/goong-js.css';
+
+// lightgallery
+@import "lightgallery.js/dist/css/lightgallery.css";

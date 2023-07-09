@@ -1,0 +1,76 @@
+@import "functions";
+
+// Color
+$color-primary: #009B90;
+$color-bg-main-1: #01686F;
+$color-bg-main-2: #003731;
+$color-bg-main-3: #F89633;
+$color-state-success: #09B377;
+$color-state-warning: #F5C61D;
+$color-state-error: #EB5757;
+$color-text-dark-1: #172723;
+$color-text-dark-2: #4F4F4F;
+$color-text-dark-3: #BDBDBD;
+$color-text-dark-4: #F4F4F4;
+$color-text-dark-5: #969696;
+$color-main: #149388;
+$color-main-second: #009B90;
+$color-layout: #FFFFFF;
+$color-white: #FFFFFF;
+$color-text-main: #333333;
+$color-background-main: #009B90;
+$color-gray: #F4F4F4;
+$color-gray2: #4F4F4F;
+$color-geodetic-bg-primary: #DE9F59;
+$color-geodetic-bg-hover: #CC893D;
+$color-geodetic-map-menu: #666666;
+$color-geodetic-hover-header: #DE9F5980;
+$color-geodetic-hover-main: #FFFFFF33;
+$color-geodetic-bg-main3: #EEEEEE;
+
+// Note**: The breakpoints was inspired by by common device resolutions.
+// From**: https://tailwindcss.com/docs/responsive-design
+
+// Grid breakpoints
+//
+// Define the minimum dimensions at which your layout will change,
+// adapting to different screen sizes, for use in media queries.
+
+// scss-docs-start grid-breakpoints
+$grid-breakpoints: (
+        xs: 0, // `xs` returns only a ruleset and no media query
+        sm: 576px, // `sm` applies to x-small devices (portrait phones, less than 576px)
+        md: 768px, // `md` applies to small devices (landscape phones, less than 768px)
+        lg: 992px, // `lg` applies to medium devices (tablets, less than 992px)
+        xl: 1200px, // `xl` applies to large devices (desktops, less than 1200px)
+        xxl: 1400px // `xxl` applies to x-large devices (large desktops, less than 1400px)
+) !default;
+// scss-docs-end grid-breakpoints
+
+$breakpoints: (
+        'sm': (min-width: 576px),
+        'md': (min-width: 768px),
+        'lg': (min-width: 992px),
+        'xl': (min-width: 1200px),
+        'xxl': (min-width: 1400px),
+        '3xl': (min-width: 1700px),
+) !default;
+
+@include _assert-ascending($grid-breakpoints, "$grid-breakpoints");
+@include _assert-starts-at-zero($grid-breakpoints, "$grid-breakpoints");
+
+// Grid containers
+//
+// Define the maximum width of `.container` for different screen sizes.
+
+// scss-docs-start container-max-widths
+$container-max-widths: (
+        sm: 540px,
+        md: 720px,
+        lg: 960px,
+        xl: 1140px,
+        xxl: 1320px
+) !default;
+// scss-docs-end container-max-widths
+
+@include _assert-ascending($container-max-widths, "$container-max-widths");

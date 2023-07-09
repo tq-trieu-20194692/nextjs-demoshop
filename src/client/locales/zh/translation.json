@@ -1,0 +1,12 @@
+{
+  "@@locale": "zh",
+  "format": {
+    "date": "DD-MM-YYYY",
+    "timeShort": "HH:mm",
+    "time": "HH:mm:ss",
+    "dateTime": "DD-MM-YYYY HH:mm:ss",
+    "dateTimeShort": "HH:mm DD/MM/YYYY",
+    "decimalPoint": ".",
+    "thousandPoint": ","
+  }
+}
