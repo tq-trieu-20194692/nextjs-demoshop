@@ -77,7 +77,7 @@ const ProductSearch =()=>{
         setCurrentPage(initialPage); // Cập nhật giá trị ban đầu của currentPage từ page trong URL
     }, [initialPage]);
 
-    const handleDelete = async (id:number) =>{
+    const handleDelete = async (id:any) =>{
         confirm({
             title: 'Are you sure delete this Product?',
             okText: 'Yes',
@@ -217,15 +217,15 @@ const ProductSearch =()=>{
         const newData = [...ProductList];
         newData.forEach((product) => {
             setSelectForm(true)
-            if (product.data.product_id === id) {
+            if (product.productId === id) {
                 setSelectedProduct(product);
                 formChange.setFieldsValue({
                     product_id: id,
-                    name: product.data.name,
-                    price: product.data.price,
-                    address: product.data.address,
-                    tags: product.data.tags,
-                    description: product.data.description,
+                    name: product.name,
+                    price: product.price,
+                    address: product.address,
+                    tag: product.tag,
+                    description: product.description,
                 });
             }
         });
@@ -236,7 +236,7 @@ const ProductSearch =()=>{
         navigate(`/productSearch/${page}/${value}`)
 
     }
-    const columns: ColumnsType<{ data: Record<string, any> }> = [
+    const columns: ColumnsType<ProductModel> = [
         {
             title: 'Product Name',
             dataIndex: ['data', 'name'],
@@ -258,10 +258,10 @@ const ProductSearch =()=>{
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button danger onClick={() => handleDelete(record.data.product_id)}>
+                    <Button danger onClick={() => handleDelete(record.productId)}>
                         Delete
                     </Button>
-                    <Button type="primary" onClick={() => handleEdit(record.data.product_id)}>
+                    <Button type="primary" onClick={() => handleEdit(record.productId)}>
                         Edit
                     </Button>
                 </Space>

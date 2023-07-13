@@ -4,8 +4,8 @@ import {cilAccountLogout, cilUserFollow} from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import noAvatar from './../../../assets/images/no_avatar.jpg'
 import {MeAction} from "../../../recoil/account/me/MeAction";
-import {Card, Dropdown, Modal} from "antd";
-import {ExclamationCircleOutlined} from "@ant-design/icons";
+import {Button, Card, Dropdown, Modal} from "antd";
+import {ExclamationCircleOutlined, UserOutlined} from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
 import {LogoutWidget} from "../../widgets/LogoutWidget";
 
@@ -89,6 +89,7 @@ const AppHeaderDropdown = () => {
                 {/*    src={vmMe.user?.image ?? noAvatar.src}*/}
                 {/*    size="md"*/}
                 {/*/>*/}
+                <Button icon={<UserOutlined/>}/>
             </Dropdown>
             {
                 isModalLogoutVisible && (

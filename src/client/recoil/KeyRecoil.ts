@@ -17,3 +17,4 @@ export const KeyTheme = createKey("theme")
 
 // Account
 export const KeyMe = createKey("me")
+export const KeyProduct = createKey("product")

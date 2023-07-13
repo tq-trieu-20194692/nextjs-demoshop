@@ -64,10 +64,10 @@ const LoginScreen = () => {
     }, [session.isAuthenticated])
 
     useEffect(() => {
-        if (vm.status === E_SendingStatus.error) {
+        if (vm.isLoading === E_SendingStatus.error) {
             setFormErrors({})
         }
-    }, [vm.status])
+    }, [vm.isLoading])
 
     useEffect(() => {
         if (vm.error && Object.keys(vm.error).length > 0) {
@@ -93,7 +93,7 @@ const LoginScreen = () => {
         })
     }
 
-    const isLoading = vm.status === E_SendingStatus.loading
+    const isLoading = vm.isLoading === E_SendingStatus.loading
 
     const onFinishFailed = (errorInfo: ValidateErrorEntity) => {
         let _formErrors = formErrors
@@ -171,7 +171,7 @@ const LoginScreen = () => {
                                 <CCard className="p-4">
                                     <CCardBody>
                                         <ErrorItemWidget
-                                            status={vm.status}
+                                            status={vm.isLoading}
                                             typeView={'modal'}
                                         >
                                             <Typography.Title

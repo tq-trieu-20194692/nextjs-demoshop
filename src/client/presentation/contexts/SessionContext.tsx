@@ -25,10 +25,10 @@ export const SessionContextProvider: React.FC<{ data?: T_NextAppData, children?:
     } = MeAction()
 
     useEffect(() => {
-        const cls = EDLocal.getLocalStore(E_LSKey.User)
+        const cls = localStorage.getItem('user')
 
         if (cls) {
-            const user = new UserModel(cls)
+            const user = new UserModel(JSON.parse(cls))
             initialSession.user = user
             initialSession.isAuthenticated = true
             initialSession.redirectPath = "/"

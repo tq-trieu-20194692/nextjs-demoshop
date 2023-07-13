@@ -23,11 +23,11 @@ export const LogoutAction = () => {
             status: E_SendingStatus.loading
         })
 
-        apiService
-            .logout()
-            .then(r => {
-                if (r.success) {
-                    // remove store user
+        // apiService
+            // .logout()
+            // .then(r => {
+            //     if (r.success) {
+            //         // remove store user
                     dispatchClearUser()
 
                     setSession({
@@ -41,15 +41,15 @@ export const LogoutAction = () => {
                         ...state,
                         status: E_SendingStatus.success,
                     })
-                } else {
-                    setState({
-                        ...state,
-                        status: E_SendingStatus.error,
-                        error: r.error
-                    })
-                }
-            })
-            .catch(err => setErrorHandled(state, setState, 'status', err))
+                // } else {
+                //     setState({
+                //         ...state,
+                //         status: E_SendingStatus.error,
+                //         error: r.error
+                //     })
+                // }
+            // })
+            // .catch(err => setErrorHandled(state, setState, 'status', err))
     }
 
     const dispatchResetState = () => {

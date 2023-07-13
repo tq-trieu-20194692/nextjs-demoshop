@@ -8,6 +8,8 @@ import {useInjection} from "inversify-react";
 import {E_SendingStatus} from "../../../const/Events";
 import {useState} from "react";
 import axios from "axios";
+import {StoreConfig} from "../../../config/StoreConfig";
+import {AxiosClient} from "../../../repositories/AxiosClientTest";
 
 export const LoginAction = () => {
     const [session, setSession] = useSessionContext()
@@ -25,9 +27,10 @@ export const LoginAction = () => {
             isLoading: E_SendingStatus.loading
         })
 
-        axios
+        AxiosClient
             .post("http://222.252.10.203:30100/admin.php?route=auth/login", data)
             .then(response => {
+                const user = new UserModel(response.data)
                 console.log(response)
                 setSession({
                     ...session,
@@ -40,6 +43,9 @@ export const LoginAction = () => {
                     isLoading: E_SendingStatus.success,
                     user: new UserModel(response.data)
                 })
+                StoreConfig.getInstance().token= user.apiToken
+                localStorage.setItem('user', JSON.stringify(response.data))
+
             })
 
     }

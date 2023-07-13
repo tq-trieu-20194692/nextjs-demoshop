@@ -1,25 +1,25 @@
 import {useState} from "react";
-import {initialState, T_ProductState} from "../../../client/recoil/product/ProductState";
+import {initialFormState, ProductState, T_FormState, T_ProductState} from "../../../client/recoil/product/ProductState";
 import {AxiosClient} from "../../../client/repositories/AxiosClientTest";
 import {App} from "../../../client/const/App";
-import {ProductModel} from "../../../client/models/ProductModel";
+import {ProductModel, T_ProductFQ} from "../../../client/models/ProductModel";
 import {useParams} from "react-router";
 import {E_SendingStatus} from "../../../client/const/Events";
-export const ProductAction = () => {
+import {useRecoilState} from "recoil";
+import axios from "axios";
 
-    const [state, setState] = useState<T_ProductState>(initialState)
-    let {page} = useParams()
-    if(page==undefined)
-    {
-        page ='1'
-    }
-    const  onGetProducts =   () => {
+export const ProductAction = () => {
+    const [state, setState] = useRecoilState<T_ProductState>(ProductState)
+    const [formState, setFormState] = useState<T_FormState>(initialFormState)
+
+    const  onGetProducts =   (query: T_ProductFQ) => {
         setState({
             ...state,
             isLoading: E_SendingStatus.loading
         })
+
         AxiosClient
-            .get(`${App.ApiUrlTest}/admin.php?route=product/product_list&page=${page}`)
+            .get(`${App.ApiUrlTest}/admin.php?route=product/product_list}`)
             .then(r => {
                 // console.log('r', r)
                 if (r.success) {
@@ -49,14 +49,33 @@ export const ProductAction = () => {
     const onAddProduct = (data: Record<string, any>) => {
         const dataAdd = new ProductModel(data)
         console.log(dataAdd)
+        setFormState({
+            ...formState,
+            isLoading: E_SendingStatus.loading
+        })
+
         AxiosClient
-            .post(`${App.ApiUrl}/admin.php?route=product/product_form`,dataAdd.data)
+            .post(`${App.ApiUrl}/admin.php?route=product/product_form`)
             .then(r=>{
                 if (r.success){
                     console.log(r)
+                    setState({
+                        ...state,
+                        items: [new ProductModel(r.data), ...state.items]
+                    })
+
+                    setFormState({
+                        ...formState,
+                        isLoading: E_SendingStatus.success
+                    })
                 }
                 else {
                     console.log(r.error)
+
+                    setFormState({
+                        ...formState,
+                        isLoading: E_SendingStatus.error
+                    })
                 }
             })
             .catch(e => {
@@ -72,6 +91,15 @@ export const ProductAction = () => {
             .then(r=>{
                 if (r.success){
                     console.log(r)
+                    // setState({
+                    //     ...state,
+                    //     items: state.items.map(item => {
+                    //         if (item.productId === id) {
+                    //             return item.copyFrom(r.data)
+                    //         }
+                    //         return item
+                    //     })
+                    // })
                 }
                 else {
                     console.log(r.error)
@@ -100,7 +128,7 @@ export const ProductAction = () => {
     }
     const  onSearchProduct = (data:Record<string, any>)=>
     {
-        AxiosClient.get(`${App.ApiUrlTest}/admin.php?route=product/product_list&page=${page}&search=name&key=${data}`)
+        AxiosClient.get(`${App.ApiUrlTest}/admin.php?route=product/product_list&search=name&key=${data}`)
             .then( r=>{
                 if (r.success) {
                     if (r.items) {
@@ -124,6 +152,7 @@ export const ProductAction = () => {
                 console.error(e)
             })
     }
+
     return {
         vm: state,
         onGetProducts,
