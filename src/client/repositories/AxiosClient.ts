@@ -32,14 +32,14 @@ export class AxiosClient {
 
         const storeConfig = StoreConfig.getInstance()
 
-        if (storeConfig.accessToken && storeConfig.accessToken.token && storeConfig.accessToken.token.length > 0) {
+        if (storeConfig.token && storeConfig.token.length > 0) {
             // console.log('accessToken', storeConfig.accessToken.token)
             const et = EDData.setData({
-                t: storeConfig.accessToken.token,
+                t: storeConfig.token,
                 e: moment().add(30, 'seconds').unix()
             })
 
-            config.headers!.Authorization = `Bearer ${et}`
+            config.headers!.Authorization = `Bearer ${storeConfig.token}`
         }
 
         const osData: _T_OsDataHeader = {
@@ -64,7 +64,7 @@ export class AxiosClient {
         console.log(`QUERY:`, query);
 
         return axios
-            .get(`${App.ApiUrl}/${ep}`, cancelToken
+            .get(`${App.ApiUrlTest}/${ep}`, cancelToken
                 ? {
                     ...AxiosClient.Config(),
                     ...{
@@ -109,7 +109,7 @@ export class AxiosClient {
         }
 
         return axios
-            .post(`${App.ApiUrl}/${ep}`, _data, config ?? AxiosClient.Config(isUp))
+            .post(`${App.ApiUrlTest}/${ep}`, _data, config ?? AxiosClient.Config(isUp))
             .then(r => {
                 const data = EDData.getData(r.data) ?? r.data
 

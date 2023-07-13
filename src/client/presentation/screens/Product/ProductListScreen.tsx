@@ -1,7 +1,7 @@
 import {ProductAction} from "../../../recoil/product/ProductAction";
 import React, {useEffect, useState} from "react";
 import { ProductModel} from "../../../models/ProductModel";
-import {Col,Row,MenuProps,Button, Space, Table, Modal, message, Form, Input, Slider} from 'antd';
+import {Col,Row,Button, Space, Table, Modal, message, Form, Input} from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate} from 'react-router-dom';
 import {useParams} from "react-router";
@@ -329,8 +329,3 @@ const ProductListScreen =()=>{
     )
 }
 export default ProductListScreen
-
-
-
-
-

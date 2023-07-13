@@ -53,45 +53,45 @@ export const MeAction = () => {
         })
     }
 
-    const dispatchUpdateMeImage = (data: Record<string, any>) => {
-        if (!state.user) {
-            return
-        }
+    // const dispatchUpdateMeImage = (data: Record<string, any>) => {
+    //     if (!state.user) {
+    //         return
+    //     }
+    //
+    //     const user = state.user
+    //
+    //     if (data.hasOwnProperty('image')) {
+    //         user.image = data.image;
+    //     }
+    //
+    //     dispatchStoreUser(user, true, false)
+    //
+    //     setSession({
+    //         ...session,
+    //         user: user
+    //     })
+    //
+    //     setState({
+    //         ...state,
+    //         user: user
+    //     })
+    // }
 
-        const user = state.user
-
-        if (data.hasOwnProperty('image')) {
-            user.image = data.image;
-        }
-
-        dispatchStoreUser(user, true, false)
-
-        setSession({
-            ...session,
-            user: user
-        })
-
-        setState({
-            ...state,
-            user: user
-        })
-    }
-
-    const dispatchStoreUser = (user: UserModel, isLS: boolean = true, isCookie: boolean = true) => {
-        storeConfig.accessToken = user.accessToken
-
-        // set localStorage
-        if (isLS) {
-            EDLocal.setLocalStore(E_LSKey.User, Utils.rmObjectByValue(user.toObject()))
-        }
-
-        // set cookie
-        if (isCookie) {
-            if (user.accessToken) {
-                EDLocal.setCookie(E_CookieKey.User, Utils.rmObjectByValue(user.accessToken.toObject()))
-            }
-        }
-    }
+    // const dispatchStoreUser = (user: UserModel, isLS: boolean = true, isCookie: boolean = true) => {
+    //     storeConfig.accessToken = user.accessToken
+    //
+    //     // set localStorage
+    //     if (isLS) {
+    //         EDLocal.setLocalStore(E_LSKey.User, Utils.rmObjectByValue(user.toObject()))
+    //     }
+    //
+    //     // set cookie
+    //     if (isCookie) {
+    //         if (user.accessToken) {
+    //             EDLocal.setCookie(E_CookieKey.User, Utils.rmObjectByValue(user.accessToken.toObject()))
+    //         }
+    //     }
+    // }
 
     const dispatchClearUser = () => {
         console.log("MeAction: dispatchClearUser")
@@ -118,8 +118,6 @@ export const MeAction = () => {
         vm,
         dispatchLoadMe,
         dispatchSetMe,
-        dispatchUpdateMeImage,
-        dispatchStoreUser,
         dispatchClearUser,
         dispatchResetState: resetState
     }

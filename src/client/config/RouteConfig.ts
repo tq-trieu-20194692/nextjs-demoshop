@@ -41,18 +41,18 @@ export class RouteConfig {
             component: ProductListScreen,
             protect: true
         },
-        {
-            name: 'product',
-            path: RouteConfig.PRODUCTFORM,
-            component: ProductForm,
-            protect: true
-        },
-        {
-            name: 'product',
-            path: RouteConfig.PRODUCTSEARCH,
-            component: ProductSearch,
-            protect: true
-        }
+        // {
+        //     name: 'product',
+        //     path: RouteConfig.PRODUCTFORM,
+        //     component: ProductForm,
+        //     protect: true
+        // },
+        // {
+        //     name: 'product',
+        //     path: RouteConfig.PRODUCTSEARCH,
+        //     component: ProductSearch,
+        //     protect: true
+        // }
 
     ]
 }

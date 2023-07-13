@@ -3,10 +3,10 @@ import {E_SendingStatus} from "../../../const/Events";
 
 export type T_LoginState = {
     user?: UserModel
-    status: E_SendingStatus
+    isLoading: E_SendingStatus
     error?: Record<string, any>
 }
 
 export const initialState: T_LoginState = {
-    status: E_SendingStatus.idle
+    isLoading: E_SendingStatus.idle
 }

@@ -7,51 +7,41 @@ import {useSessionContext} from "../../../presentation/contexts/SessionContext";
 import {useInjection} from "inversify-react";
 import {E_SendingStatus} from "../../../const/Events";
 import {useState} from "react";
+import axios from "axios";
 
 export const LoginAction = () => {
     const [session, setSession] = useSessionContext()
     const apiService = useInjection(ApiService)
 
-    const {
-        dispatchStoreUser
-    } = MeAction()
+    // const {
+    //     dispatchStoreUser
+    // } = MeAction()
 
     const [state, setState] = useState<T_LoginState>(initialState)
 
     const dispatchLogIn = (data: T_LoginVO) => {
         setState({
             ...state,
-            status: E_SendingStatus.loading
+            isLoading: E_SendingStatus.loading
         })
 
-        apiService
-            .login(data)
-            .then(r => {
-                if (r.success) {
-                    const user = new UserModel(r.data)
-
-                    dispatchStoreUser(user)
-
-                    setSession({
-                        ...session,
-                        isAuthenticated: true,
-                        user: user
-                    })
-
-                    setState({
-                        ...state,
-                        user: user,
-                        status: E_SendingStatus.success
-                    })
-                } else {
-                    setState({
-                        ...state,
-                        status: E_SendingStatus.error,
-                        error: r.error
-                    })
-                }
+        axios
+            .post("http://222.252.10.203:30100/admin.php?route=auth/login", data)
+            .then(response => {
+                console.log(response)
+                setSession({
+                    ...session,
+                    isAuthenticated: true,
+                    user: new UserModel(response.data),
+                    redirectPath:'/'
+                })
+                setState({
+                    ...state,
+                    isLoading: E_SendingStatus.success,
+                    user: new UserModel(response.data)
+                })
             })
-            .catch(err => setErrorHandled(state, setState, 'status', err))
+
     }
 
     const dispatchResetState = () => {

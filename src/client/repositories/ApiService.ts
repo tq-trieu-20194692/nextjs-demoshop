@@ -2,7 +2,7 @@ import {AxiosClient} from "./AxiosClient";
 import {ApiResModel} from "../models/ApiResModel";
 import {injectable} from "inversify";
 import {T_LoginVO} from "../models/UserModel";
-
+import {App} from "../const/App"
 @injectable()
 export class ApiService {
     init(): Promise<ApiResModel> {
@@ -14,7 +14,7 @@ export class ApiService {
     }
 
     login(data: T_LoginVO): Promise<ApiResModel> {
-        return AxiosClient.post("auth/login", data);
+        return AxiosClient.post(`${App.ApiUrlTest}/admin.php?route=auth/login`, data);
     }
 
     logout(): Promise<ApiResModel> {

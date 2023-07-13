@@ -26,31 +26,28 @@ export type T_LoginVO = {
 // }
 
 export class UserModel extends Model {
-    id?: number
-    name?: string
-    username?: string
-    email?: string
-    image?: string
-    isOwner?: boolean
-
-    accessToken?: AccessTokenModel
+    userId : string
+    userGroupId?: string
+    username: string
+    status?: string
+    createAt?: string
+    updateAt?: string
+    apiToken?: string
 
     constructor(data: Record<string, any>) {
         super(data)
 
-        this.id = Normalize.initJsonNumber(data, 'id')
-        this.name = Normalize.initJsonString(data, 'name')
-        this.username = Normalize.initJsonString(data, 'username')
-        this.email = Normalize.initJsonString(data, 'email')
-        this.image = Normalize.initJsonString(data, 'image')
-        this.isOwner = Normalize.initJsonBool(data, 'is_owner')
-
-        this.accessToken = Normalize.initJsonObject(data, 'access_token', v => new AccessTokenModel(v))
+        this.username = Normalize.initJsonString(data, 'username') || ""
+        this.userId = Normalize.initJsonString(data, 'user_id') || ""
+        this.userGroupId = Normalize.initJsonString(data, 'user_group_id')
+        this.status = Normalize.initJsonString(data, 'status')
+        this.createAt = Normalize.initJsonString(data, 'creat_at')
+        this.updateAt = Normalize.initJsonString(data, 'update_at')
+        this.apiToken = Normalize.initJsonString(data, 'api_token')
     }
 }
 
 export class AccessTokenModel extends Model {
-    token?: string
     abilities?: string[]
     expiresAt?: string
     updatedAt?: string
@@ -63,7 +60,6 @@ export class AccessTokenModel extends Model {
     constructor(data: Record<string, any>) {
         super(data)
 
-        this.token = Normalize.initJsonString(data, 'token')
         this.abilities = Normalize.initJsonArray(data, 'abilities')
         this.expiresAt = Normalize.initJsonString(data, 'expires_at')
         this.updatedAt = Normalize.initJsonString(data, 'updated_at')

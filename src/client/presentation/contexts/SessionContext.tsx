@@ -33,11 +33,11 @@ export const SessionContextProvider: React.FC<{ data?: T_NextAppData, children?:
             initialSession.isAuthenticated = true
             initialSession.redirectPath = "/"
 
-            storeConfig.accessToken = user.accessToken
+            storeConfig.token = user.apiToken
 
-            if (!EDLocal.getCookie(E_CookieKey.User) && user.accessToken) {
-                EDLocal.setCookie(E_CookieKey.User, Utils.rmObjectByValue(user.accessToken.toObject()))
-            }
+            // if (!EDLocal.getCookie(E_CookieKey.User) && user.apiToken) {
+            //     EDLocal.setCookie(E_CookieKey.User, Utils.rmObjectByValue(user.apiToken))
+            // }
 
             dispatchSetMe(user)
         }
