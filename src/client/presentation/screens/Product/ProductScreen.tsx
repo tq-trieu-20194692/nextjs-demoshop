@@ -8,18 +8,25 @@ import {useParams} from "react-router";
 import {UrlQuery} from "../../../core/UrlQuery";
 import {ProductFormWidget, T_FormProps} from "./ProductFormWidget";
 
+type _T_DataTable = {
+    product_id : string
+    name : string
+    status : string
+    tag : string
+    description : string
+    price : string
+}
+
 const { Search } = Input;
 const { confirm } = Modal;
 
-const ProductListScreen =( )=>{
+const ProductScreen =( )=>{
     const navigate = useNavigate()
     const location = useLocation()
 
     const {
         vm,
         onGetProducts,// lấy danh sách dữ liệu
-        onDeleteProduct, // xóa dữ liệu
-        onEditProduct
     } = ProductAction()
 
     const URL = new UrlQuery(location.search)
@@ -42,7 +49,6 @@ const ProductListScreen =( )=>{
 
     const [selectedProductName, setSelectedProductName] = useState<string | null>(null);
     const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
-    // const { onGetProducts, onDeleteProduct, onEditProduct } = ProductAction();
 
     //
     const [ProductList,setProductList] = useState<ProductModel[]>(
@@ -60,10 +66,10 @@ const ProductListScreen =( )=>{
     )
 
     useEffect(() => {
-        console.log('MOUNT: Product List Screen');
+        console.log('MOUNT: Product Screen');
         onGetProducts(new UrlQuery(queryParams).toObject())
         return () => {
-            console.log('UNMOUNT: Product List Screen');
+            console.log('UNMOUNT: Product Screen');
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,13 +89,7 @@ const ProductListScreen =( )=>{
     useEffect(() => {
         console.log('vm.error', vm.error)
     }, [vm.error])
-    // const initialPage = 1 ? parseInt(1, 10) : 1; // Giá trị ban đầu của currentPage từ page trong URL
-    //
-    // const [currentPage, setCurrentPage] = useState(initialPage);
-    //
-    // useEffect(() => {
-    //     setCurrentPage(initialPage); // Cập nhật giá trị ban đầu của currentPage từ page trong URL
-    // }, [initialPage]);
+
 
     const onChangePage = (page: number) => {
         const urlQueryParams = new UrlQuery(queryParams)
@@ -106,37 +106,7 @@ const ProductListScreen =( )=>{
         })
     }
 
-    // const handleDelete = async (id:any) =>{
-    //     confirm({
-    //         title: 'Are you sure delete this Product?',
-    //         okText: 'Yes',
-    //         okType: 'danger',
-    //         cancelText: 'No',
-    //         onOk: async () => {
-    //             console.log(id);
-    //             try {
-    //                 await onDeleteProduct(id);
-    //                 await onGetProducts();
-    //                 message.success("Delete success");
-    //             } catch (error) {
-    //                 message.error("Delete failed");
-    //             }
-    //         },
-    //         onCancel() {
-    //             console.log('Cancel');
-    //         },
-    //     });
-    // }
 
-    // const paginationOptions = {
-    //     pageSize: 10,
-    //     current: currentPage,
-    //     total:45,
-    //     onChange: (page: number) => {
-    //         setCurrentPage(page);
-    //         navigate(/productList/${page}, { state: {  selectedProductName, selectedPrice } });
-    //     },
-    // };
 
     const [isModalOpenChange, setIsModalOpenChange] = useState(false)
     const [selectForm, setSelectForm] = useState<boolean>(false)
@@ -157,89 +127,7 @@ const ProductListScreen =( )=>{
         setIsModalOpenChange(false)
     }
 
-    // const ChangeForm = ()=>{
-    //     const onFinish = (values: any) => {
-    //         console.log('onFinish:', values)
-    //         const id = parseInt(values.product_id)
-    //         console.log(id)
-    //         onEditProduct(id,values)
-    //         onGetProducts()
-    //         message.success('Update success!').then();
-    //     }
-    //
-    //     const onFinishFailed = (errorInfo: any) => {
-    //         console.log('onFinishFailed:', errorInfo)
-    //         message.error('Update failed!').then();
-    //     }
-    //     return (
-    //         <div style={{display: "flex", justifyContent: "space-evenly"}}>
-    //             <Form
-    //                 name="basic"
-    //                 labelCol={{span: 5}}
-    //                 wrapperCol={{span: 20}}
-    //                 style={{maxWidth: 800, width: 500}}
-    //                 initialValues={{remember: true}}
-    //                 onFinish={onFinish}
-    //                 onFinishFailed={onFinishFailed}
-    //                 autoComplete="off"
-    //                 form={formChange}
-    //             >
-    //                 <Form.Item
-    //                     label="Product_id"
-    //                     name="product_id"
-    //                     rules={[{required: true, message: 'Please input your name Product!'}]}
-    //                 >
-    //                     <Input disabled={true}/>
-    //                 </Form.Item>
-    //                 <Form.Item
-    //                     label="Name"
-    //                     name="name"
-    //                     rules={[{required: true, message: 'Please input your name Product!'}]}
-    //
-    //                 >
-    //                     <Input/>
-    //                 </Form.Item>
-    //
-    //                 <Form.Item
-    //                     label="Price"
-    //                     name="price"
-    //                     rules={[{required: true, message: 'Please input Price!'}]}
-    //                 >
-    //                     <Input/>
-    //                 </Form.Item>
-    //
-    //                 <Form.Item
-    //                     label="Sale"
-    //                     name="sale"
-    //                 >
-    //                     <Input/>
-    //                 </Form.Item>
-    //
-    //                 <Form.Item
-    //                     label="Description"
-    //                     name="description"
-    //                 >
-    //                     <Input.TextArea rows={6}/>
-    //                 </Form.Item>
-    //                 <Form.Item
-    //                     label="Tag"
-    //                     name="tag"
-    //                 >
-    //                     <Input/>
-    //                 </Form.Item>
-    //
-    //                 <Form.Item wrapperCol={{offset: 11, span: 16}}>
-    //                     <Button
-    //                         type="primary"
-    //                         htmlType="submit"
-    //                     >
-    //                         Update
-    //                     </Button>
-    //                 </Form.Item>
-    //             </Form>
-    //         </div>
-    //     )
-    // }
+
 
     const onOpenForm = () => {
         setFormProps({
@@ -284,7 +172,7 @@ const ProductListScreen =( )=>{
         }
     }
 
-    const columns: ColumnsType<ProductModel> = [
+    const columns: ColumnsType<_T_DataTable> = [
         {
             title: 'Product Name',
             dataIndex: 'name',
@@ -296,16 +184,7 @@ const ProductListScreen =( )=>{
             title: 'Price',
             dataIndex: 'price',
             key: 'price',
-            // filters: ProductList.map((item) => ({ text: item.price, value: item.price })),
-            // onFilter: (value, record) => {
-            //     if (minPrice !== undefined && record.data.price < minPrice) {
-            //         return false;
-            //     }
-            //     if (maxPrice !== undefined && record.data.price > maxPrice) {
-            //         return false;
-            //     }
-            //     return true;
-            // },
+
         },
         {
             title: 'Tag',
@@ -317,10 +196,6 @@ const ProductListScreen =( )=>{
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    {/*<Button danger onClick={() => handleDelete(record.productId)}>*/}
-                    {/*    Delete*/}
-                    {/*</Button>*/}
-                    {/*<Button type="primary" onClick={() => handleEdit(record.productId)}>*/}
                     <Button type="primary" onClick={onOpenForm}>
                         Edit
                     </Button>
@@ -328,6 +203,11 @@ const ProductListScreen =( )=>{
             ),
         },
     ]
+
+    const dataSource:Array<_T_DataTable> = vm.items.map((item, index) => ({
+        ...item,
+        key: index.toString()
+    }))
 
 
     return(
@@ -348,7 +228,7 @@ const ProductListScreen =( )=>{
             <Table
                 // pagination={paginationOptions}
                 columns={columns}
-                dataSource={ProductList.map((item, index) => ({ ...item, key: index.toString() }))}
+                dataSource={dataSource}
             />
 
             <ProductFormWidget
@@ -358,4 +238,4 @@ const ProductListScreen =( )=>{
         </>
     )
 }
-export default ProductListScreen
+export default ProductScreen

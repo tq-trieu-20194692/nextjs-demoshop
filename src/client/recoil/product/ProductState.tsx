@@ -24,6 +24,7 @@ export const ProductState = atom<T_ProductState>({
     default: initialState
 })
 
+
 export const initialFormState: T_FormState = {
     isLoading: E_SendingStatus.idle
 }

@@ -1,16 +1,7 @@
 import {Model} from "./Model";
 import {Normalize} from "../core/Normalize";
 
-// export interface DataItem {
-//     attribute_id: string;
-//     name: string;
-//     images: string[] | null;
-//     description: string;
-//     price: string;
-//     sale: boolean;
-//     href: string;
-//     tag: string;
-// }
+
 export type T_ProductFQ = {
     page?: number
     limit?: number
@@ -40,7 +31,7 @@ export class ProductModel extends Model{
     price: string;
     sale: string;
     tag: string;
-    address?:string
+    // address?:string
     // data : Record<string, any>
 
     constructor(data: Record<string, any>) {
@@ -53,7 +44,7 @@ export class ProductModel extends Model{
         this.price = Normalize.initJsonString(data, "price") || ""
         this.sale = Normalize.initJsonString(data, "sale") || ""
         this.tag = Normalize.initJsonString(data, "tag") || ""
-        this.address = Normalize.initJsonString(data, "address")
+        // this.address = Normalize.initJsonString(data, "address")
 
     }
     copyFrom = (data: Record<string, any>): ProductModel => {

@@ -14,7 +14,7 @@ export type T_Rco = _T_Rcc & {
 }
 
 const DashboardScreen = lazy(() => import("../presentation/screens/dashboard/DashboardScreen"))
-const ProductListScreen = lazy(() => import ("../presentation/screens/Product/ProductListScreen"))
+const ProductScreen = lazy(() => import ("../presentation/screens/Product/ProductScreen"))
 const ProductForm = lazy(() => import ("../presentation/screens/Product/ProductForm"))
 const ProductSearch = lazy(() => import ("../presentation/screens/Product/ProductSearch"))
 
@@ -38,7 +38,7 @@ export class RouteConfig {
         {
             name: 'product',
             path: RouteConfig.PRODUCT,
-            component: ProductListScreen,
+            component: ProductScreen,
             protect: true
         },
         // {

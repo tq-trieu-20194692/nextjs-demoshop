@@ -7,8 +7,12 @@ import {useParams} from "react-router";
 import {E_SendingStatus} from "../../../client/const/Events";
 import {useRecoilState} from "recoil";
 import axios from "axios";
+import {UserModel} from "../../models/UserModel";
+import {StoreConfig} from "../../config/StoreConfig";
+import {useSessionContext} from "../../presentation/contexts/SessionContext";
 
 export const ProductAction = () => {
+    const [session, setSession] = useSessionContext()
     const [state, setState] = useRecoilState<T_ProductState>(ProductState)
     const [formState, setFormState] = useState<T_FormState>(initialFormState)
 
@@ -19,30 +23,15 @@ export const ProductAction = () => {
         })
 
         AxiosClient
-            .get(`${App.ApiUrlTest}/admin.php?route=product/product_list}`)
-            .then(r => {
-                // console.log('r', r)
-                if (r.success) {
-                    if (r.items) {
-                        setState({
-                            ...state,
-                            isLoading: E_SendingStatus.success,
-                            //lưu dữ liệu vào state.items là 1 mảng là các phần từ có kiểu ProductModel
-                            items: r.items.map((v: Record<string, any>) => new ProductModel(v))
-                        })
-                    }
-
-                } else if (r.error) {
-                    setState({
-                        ...state,
-                        isLoading: E_SendingStatus.error,
-                        error: r.error
-                    })
-
-                }
-            })
-            .catch(e => {
-                console.error(e)
+            .get("http://222.252.10.203:30100/admin.php?route=product/product_list")
+            .then(response => {
+                const items = new ProductModel(response.data)
+                console.log(response)
+                setState({
+                    ...state,
+                    isLoading: E_SendingStatus.success,
+                    items: response.items.map(item => new ProductModel(item))
+                })
             })
     }
 
@@ -55,7 +44,7 @@ export const ProductAction = () => {
         })
 
         AxiosClient
-            .post(`${App.ApiUrl}/admin.php?route=product/product_form`)
+            .post(`${App.ApiUrlTest}/admin.php?route=product/product_form`)
             .then(r=>{
                 if (r.success){
                     console.log(r)
@@ -91,15 +80,15 @@ export const ProductAction = () => {
             .then(r=>{
                 if (r.success){
                     console.log(r)
-                    // setState({
-                    //     ...state,
-                    //     items: state.items.map(item => {
-                    //         if (item.productId === id) {
-                    //             return item.copyFrom(r.data)
-                    //         }
-                    //         return item
-                    //     })
-                    // })
+                    setState({
+                        ...state,
+                        items: state.items.map(item => {
+                            if (item.productId === id) {
+                                return item.copyFrom(r.data)
+                            }
+                            return item
+                        })
+                    })
                 }
                 else {
                     console.log(r.error)
