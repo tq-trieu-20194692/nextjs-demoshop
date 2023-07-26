@@ -1,71 +1,85 @@
 import {useState} from "react";
-import {initialFormState, ProductState, T_FormState, T_ProductState} from "../../../client/recoil/product/ProductState";
-import {AxiosClient} from "../../../client/repositories/AxiosClientTest";
-import {App} from "../../../client/const/App";
-import {ProductModel, T_ProductFQ} from "../../../client/models/ProductModel";
-import {useParams} from "react-router";
-import {E_SendingStatus} from "../../../client/const/Events";
+import {initialFormState, ProductState, T_FormState, T_ProductState} from "./ProductState";
+import {AxiosClient} from "../../repositories/AxiosClientTest";
+import {App} from "../../const/App";
+import {ProductModel, T_ProductFQ} from "../../models/ProductModel";
+import {E_SendingStatus} from "../../const/Events";
 import {useRecoilState} from "recoil";
-import axios from "axios";
-import {UserModel} from "../../models/UserModel";
-import {StoreConfig} from "../../config/StoreConfig";
-import {useSessionContext} from "../../presentation/contexts/SessionContext";
 
 export const ProductAction = () => {
-    const [session, setSession] = useSessionContext()
     const [state, setState] = useRecoilState<T_ProductState>(ProductState)
     const [formState, setFormState] = useState<T_FormState>(initialFormState)
 
-    const  onGetProducts =   (query: T_ProductFQ) => {
+    const onGetProducts = (query: T_ProductFQ) => {
+        console.log(query)
         setState({
             ...state,
             isLoading: E_SendingStatus.loading
         })
+        if (query.search !== undefined) {
+            AxiosClient
+                .get(`http://222.252.10.203:30100/admin.php?route=product/product_list&search=name,price&key=${query.search}&page=${query.page}`)
+                .then(response => {
+                    console.log(response)
+                    setState({
+                        ...state,
+                        isLoading: E_SendingStatus.success,
+                        items: response.items.map(item => new ProductModel(item)),
+                        query:{
+                            page: response.meta_data.current_page,
+                            count: response.meta_data.total_count,
+                            page_item: response.meta_data.per_page
+                        }
 
-        AxiosClient
-            .get("http://222.252.10.203:30100/admin.php?route=product/product_list")
-            .then(response => {
-                const items = new ProductModel(response.data)
-                console.log(response)
-                setState({
-                    ...state,
-                    isLoading: E_SendingStatus.success,
-                    items: response.items.map(item => new ProductModel(item))
+                    })
                 })
-            })
+        } else {
+            AxiosClient
+                .get(`http://222.252.10.203:30100/admin.php?route=product/product_list&page=${query.page}`)
+                .then(response => {
+                    console.log(response)
+                    setState({
+                        ...state,
+                        isLoading: E_SendingStatus.success,
+                        items: response.items.map(item => new ProductModel(item)),
+                        query:{
+                            page: response.meta_data.current_page,
+                            count: response.meta_data.total_count,
+                            page_item: response.meta_data.per_page
+                        }
+                    })
+                })
+        }
     }
 
     const onAddProduct = (data: Record<string, any>) => {
-        const dataAdd = new ProductModel(data)
-        console.log(dataAdd)
+        console.log(data)
         setFormState({
             ...formState,
             isLoading: E_SendingStatus.loading
         })
-
         AxiosClient
-            .post(`${App.ApiUrlTest}/admin.php?route=product/product_form`)
-            .then(r=>{
-                if (r.success){
+            .post(`${App.ApiUrlTest}/admin.php?route=product/product_form`, data)
+            .then(r => {
+                if (r.success) {
                     console.log(r)
+
                     setState({
                         ...state,
-                        items: [new ProductModel(r.data), ...state.items]
+                        items: [new ProductModel(r.item), ...state.items]
                     })
-
                     setFormState({
                         ...formState,
                         isLoading: E_SendingStatus.success
                     })
-                }
-                else {
+                } else {
                     console.log(r.error)
-
                     setFormState({
                         ...formState,
                         isLoading: E_SendingStatus.error
                     })
                 }
+                console.log(state)
             })
             .catch(e => {
                 console.log(e)
@@ -73,24 +87,23 @@ export const ProductAction = () => {
             })
     }
 
-    const onEditProduct = (id: number, data: Record<string, any>) => {
-        const dataEdit = new ProductModel(data)
+    const onEditProduct = (id: string, data: Record<string, any>) => {
+        console.log(data)
         AxiosClient
-            .post(`${App.ApiUrlTest}/admin.php?route=product/product_form`,data)
-            .then(r=>{
-                if (r.success){
+            .post(`${App.ApiUrlTest}/admin.php?route=product/product_form`, data)
+            .then(r => {
+                if (r.success) {
                     console.log(r)
                     setState({
                         ...state,
                         items: state.items.map(item => {
                             if (item.productId === id) {
-                                return item.copyFrom(r.data)
+                                return item.copyFrom(r.item); // Cập nhật dữ liệu của sản phẩm tại vị trí tương ứng trong mảng
                             }
-                            return item
+                            return item;
                         })
                     })
-                }
-                else {
+                } else {
                     console.log(r.error)
                 }
             })
@@ -100,14 +113,17 @@ export const ProductAction = () => {
             })
     }
 
-    const onDeleteProduct = (id:number) => {
+    const onDeleteProduct = (id: string) => {
         AxiosClient
             .get(`${App.ApiUrlTest}/admin.php?route=product/product_delete&selected[]=${id}`)
-            .then(r=>{
-                if (r.success){
+            .then(r => {
+                if (r.success) {
                     console.log(r)
-                }
-                else {
+                    setState({
+                        ...state,
+                        items: state.items.filter((item: ProductModel) => item.productId !== id)
+                    })
+                } else {
                     console.log(r.error)
                 }
             })
@@ -115,10 +131,9 @@ export const ProductAction = () => {
                 console.log(e)
             })
     }
-    const  onSearchProduct = (data:Record<string, any>)=>
-    {
+    const onSearchProduct = (data: Record<string, any>) => {
         AxiosClient.get(`${App.ApiUrlTest}/admin.php?route=product/product_list&search=name&key=${data}`)
-            .then( r=>{
+            .then(r => {
                 if (r.success) {
                     if (r.items) {
                         setState({

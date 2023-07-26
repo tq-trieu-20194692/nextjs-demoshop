@@ -1,32 +1,36 @@
 import {ProductAction} from "../../../recoil/product/ProductAction";
 import React, {useEffect, useState} from "react";
 import {ProductModel, T_ProductFQ} from "../../../models/ProductModel";
-import {Col,Row,Button, Space, Table, Modal, message, Form, Input} from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import {Button, Col, Input, message, Modal, Row, Space, Table} from 'antd';
+import type {ColumnsType} from 'antd/es/table';
 import {useLocation, useNavigate} from 'react-router-dom';
-import {useParams} from "react-router";
 import {UrlQuery} from "../../../core/UrlQuery";
 import {ProductFormWidget, T_FormProps} from "./ProductFormWidget";
 
 type _T_DataTable = {
-    product_id : string
-    name : string
-    status : string
-    tag : string
-    description : string
-    price : string
-}
+    product_id?: string; // Add 'product_id' property
+    name?: string;
+    status?: string; // Add 'status' property
+    tag?: string;
+    description?: string;
+    price?: string;
+};
 
-const { Search } = Input;
-const { confirm } = Modal;
+const {Search} = Input;
+const {confirm} = Modal;
 
-const ProductScreen =( )=>{
+const ProductScreen = () => {
     const navigate = useNavigate()
     const location = useLocation()
+    // const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
+    // const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
+    const [currentPage, setCurrentPage] = useState<number | undefined>(1)
+
 
     const {
         vm,
-        onGetProducts,// lấy danh sách dữ liệu
+        onGetProducts,
+        onDeleteProduct// lấy danh sách dữ liệu
     } = ProductAction()
 
     const URL = new UrlQuery(location.search)
@@ -35,12 +39,13 @@ const ProductScreen =( )=>{
     const limit = URL.getInt("limit")
     const sort = URL.get("sort")
     const order = URL.get("order")
-
+    const search = URL.get("search")
     const [queryParams, setQueryParams] = useState<T_ProductFQ>({
         page: page,
         limit: limit,
         sort: sort,
-        order: order
+        order: order,
+        search: search,
     })
 
     const [formProps, setFormProps] = useState<T_FormProps>({
@@ -51,8 +56,8 @@ const ProductScreen =( )=>{
     const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
 
     //
-    const [ProductList,setProductList] = useState<ProductModel[]>(
-        ()=>{
+    const [ProductList, setProductList] = useState<ProductModel[]>(
+        () => {
             try {
                 const lsItem = localStorage.getItem('ProductList')
                 if (lsItem) {
@@ -67,13 +72,11 @@ const ProductScreen =( )=>{
 
     useEffect(() => {
         console.log('MOUNT: Product Screen');
-        onGetProducts(new UrlQuery(queryParams).toObject())
+        onGetProducts(new UrlQuery(queryParams).toObject());
         return () => {
             console.log('UNMOUNT: Product Screen');
         }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ selectedProductName, selectedPrice]);
+    }, []);
 
     useEffect(() => {
         console.log('vm.isLoading', vm.isLoading)
@@ -83,95 +86,102 @@ const ProductScreen =( )=>{
     useEffect(() => {
         console.log('vm.items', vm.items)
         setProductList(vm.items)
-        localStorage.setItem('ProductList',JSON.stringify(vm.items))
+        setCurrentPage(vm.query.page)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [vm.items])
 
     useEffect(() => {
         console.log('vm.error', vm.error)
     }, [vm.error])
 
+    //
+    // const onChangePage = (page: number) => {
+    //     const urlQueryParams = new UrlQuery(queryParams)
+    //     urlQueryParams.set("page", page)
+    //     onGetProducts(urlQueryParams.toObject())
+    //     setQueryParams(urlQueryParams.toObject())
+    //     navigate({
+    //         search: urlQueryParams.toString()
+    //     },{
+    //         replace: true
+    //     })
+    // }
+    const urlQueryParams = new UrlQuery(queryParams)
+    const paginationOptions = {
+        pageSize: vm.query.page_item,
+        current: currentPage,
+        total: vm.query.count,
+        onChange: (page: number) => {
+            urlQueryParams.set("page", page)
+            onGetProducts(urlQueryParams.toObject())
+            setQueryParams(urlQueryParams.toObject())
+            navigate({
+                search: urlQueryParams.toString()
+            }, {
+                replace: true
+            })
+        }
+    };
+    const onSearch = (value: any) => {
+        console.log(value)
+        if (value.length === 0) {
+            //xóa tất cả set trong urlQueryParams
+            urlQueryParams.delete("search"); // Xóa tham số 'order'
+        } else {
+            urlQueryParams.set("search", value)
+            urlQueryParams.set("page", 1)
 
-    const onChangePage = (page: number) => {
-        const urlQueryParams = new UrlQuery(queryParams)
-
-        urlQueryParams.set("page", page)
+        }
 
         onGetProducts(urlQueryParams.toObject())
         setQueryParams(urlQueryParams.toObject())
-
         navigate({
             search: urlQueryParams.toString()
-        },{
+        }, {
             replace: true
         })
+
     }
-
-
-
-    const [isModalOpenChange, setIsModalOpenChange] = useState(false)
-    const [selectForm, setSelectForm] = useState<boolean>(false)
-    const [formChange] = Form.useForm();
-    const [selectedProduct, setSelectedProduct] = useState<ProductModel | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    //
-    const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
-    const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
-
-    //
-    const handleOk = () => {
-        setIsModalOpen(false);
-        setIsModalOpenChange(false)
-    }
-    const handleCancel = () => {
-        setIsModalOpen(false);
-        setIsModalOpenChange(false)
-    }
-
-
-
     const onOpenForm = () => {
         setFormProps({
             isOpen: true
         })
     }
+    const onOpenFormChange = (id: any) => {
+        console.log(id)
+        setFormProps({
+            isOpen: true,
+            productId: id
+        })
 
+    }
     const onCloseForm = () => {
         setFormProps({
             isOpen: false
         })
     }
 
-    const handleEdit =(id:string) => {
-        setIsModalOpenChange(true)
-        const newData = [...ProductList];
-        newData.forEach((product) => {
-            setSelectForm(true)
-            if (product.productId === id) {
-                setSelectedProduct(product);
-                formChange.setFieldsValue({
-                    product_id: id,
-                    name: product.name,
-                    price: product.price,
-                    address: product.address,
-                    tag: product.tag,
-                    description: product.description,
-                });
-            }
+    const handleDelete = async (id: any) => {
+        confirm({
+            title: 'Are you sure delete this Product?',
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk: async () => {
+                console.log(id);
+                try {
+                    await onDeleteProduct(id);
+
+                    message.success("Delete success");
+                } catch (error) {
+                    message.error("Delete failed");
+                }
+            },
+            onCancel() {
+                console.log('Cancel');
+            },
         });
-    };
-
-    const onSearch = (value: any) => {
-        console.log(value)
-        if(value===undefined)
-        {
-            message.error("ERROR").then()
-        }
-        else {
-            setSelectedProductName(value);
-            // navigate(/productSearch/${value})
-        }
     }
-
     const columns: ColumnsType<_T_DataTable> = [
         {
             title: 'Product Name',
@@ -188,7 +198,7 @@ const ProductScreen =( )=>{
         },
         {
             title: 'Tag',
-            dataIndex:'tag',
+            dataIndex: 'tag',
             key: 'address',
         },
         {
@@ -196,21 +206,29 @@ const ProductScreen =( )=>{
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button type="primary" onClick={onOpenForm}>
+                    <Button type="primary" onClick={() => onOpenFormChange(record.product_id)}>
                         Edit
+                    </Button>
+                    <Button danger onClick={() => handleDelete(record.product_id)}>
+                        Delete
                     </Button>
                 </Space>
             ),
         },
     ]
 
-    const dataSource:Array<_T_DataTable> = vm.items.map((item, index) => ({
-        ...item,
-        key: index.toString()
+    const dataSource: Array<_T_DataTable> = vm.items.map((item, index) => ({
+        product_id: item.productId, // Assign 'productId' to 'product_id'
+        name: item.name,
+        // Assuming 'status' property exists in 'ProductModel'
+        tag: item.tag,
+        description: item.description,
+        price: item.price,
+        key: index.toString(),
     }))
 
 
-    return(
+    return (
         <>
             {/*{*/}
             {/*    selectForm && (*/}
@@ -220,20 +238,24 @@ const ProductScreen =( )=>{
             {/*    )*/}
             {/*}*/}
             <Row>
-                <Col span={16}>
-                    <Search placeholder="search product" onSearch={onSearch} style={{ width: 200,marginBottom:'12px' }} />
+                <Col span={20}>
+                    <Search placeholder="search product" onSearch={onSearch} style={{width: 200, marginBottom: '12px'}}/>
                 </Col>
-
+                <Col span={3}>
+                    <Button onClick={() => onOpenForm()}>Add Product</Button>
+                </Col>
             </Row>
             <Table
-                // pagination={paginationOptions}
+                pagination={paginationOptions}
                 columns={columns}
                 dataSource={dataSource}
             />
 
             <ProductFormWidget
                 isOpen={formProps.isOpen}
+                id={formProps.productId}
                 onClose={onCloseForm}
+
             />
         </>
     )

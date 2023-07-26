@@ -1,15 +1,6 @@
 {
   "name": "ts-nextjs-atl-admin",
   "version": "1.0.0",
-  "repository": {
-    "type": "git",
-    "url": "https://gitlab.com/ii-atl/ts-nextjs-atl-admin"
-  },
-  "author": "I&I HiTech",
-  "contributors": [
-    "Dương Thanh Hải <duonghainbs@gmail.com>",
-    "Nguyễn Đình Thị Thu Vân <vaan.nguyend@gmail.com>"
-  ],
   "private": true,
   "engines": {
     "node": ">=18.0.0"

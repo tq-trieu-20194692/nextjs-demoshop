@@ -15,8 +15,6 @@ export type T_Rco = _T_Rcc & {
 
 const DashboardScreen = lazy(() => import("../presentation/screens/dashboard/DashboardScreen"))
 const ProductScreen = lazy(() => import ("../presentation/screens/Product/ProductScreen"))
-const ProductForm = lazy(() => import ("../presentation/screens/Product/ProductForm"))
-const ProductSearch = lazy(() => import ("../presentation/screens/Product/ProductSearch"))
 
 
 export class RouteConfig {
@@ -25,8 +23,6 @@ export class RouteConfig {
 
     static readonly DASHBOARD: string = "/dashboard"
     static readonly PRODUCT: string = "/product"
-    static readonly PRODUCTFORM: string = "/productform"
-    static readonly PRODUCTSEARCH: string = "/productsearch"
 
     static masterRoutes: T_Rco[] = [
         {
@@ -41,18 +37,7 @@ export class RouteConfig {
             component: ProductScreen,
             protect: true
         },
-        // {
-        //     name: 'product',
-        //     path: RouteConfig.PRODUCTFORM,
-        //     component: ProductForm,
-        //     protect: true
-        // },
-        // {
-        //     name: 'product',
-        //     path: RouteConfig.PRODUCTSEARCH,
-        //     component: ProductSearch,
-        //     protect: true
-        // }
+
 
     ]
 }

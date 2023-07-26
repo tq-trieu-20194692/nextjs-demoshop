@@ -4,10 +4,11 @@ import { LoadingOutlined}  from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
 import dynamic from "next/dynamic";
 import {ProductAction} from "../../../recoil/product/ProductAction";
-import {useNavigate} from "react-router-dom";
+
 export type T_FormProps = {
     isOpen: boolean
     onClose?: Function
+    productId?: string
 }
 const NextQuill = dynamic(() => import("react-quill"), {
     ssr: false,
@@ -17,21 +18,36 @@ export const ProductFormWidget = (props) => {
     const {
         vm,
         onAddProduct,
+        onEditProduct,
     } = ProductAction()
+    const [form] = Form.useForm();
     useEffect(() => {
         console.log('MOUNT: Product Form Widget ')
-
+        if(props.id!==undefined)
+        {
+            const foundProduct = vm.items.find((product) => product.productId === props.id);
+                form.setFieldsValue({
+                    product_id: foundProduct?.productId,
+                    name: foundProduct?.name || "",
+                    price: foundProduct?.price,
+                    tag: foundProduct?.tag,
+                    description: foundProduct?.description,
+                });
+        }
+        else {
+            form.resetFields();
+        }
         return () => {
             console.log('UNMOUNT: Product Form Widget')
         }
-
-    }, [])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.id])
     const onCloseForm = () => {
         if (props.onClose) {
             props.onClose()
         }
     }
-    const [form] = Form.useForm();
+
     const [description, setDescription] = useState("");
 
     const onFinish = async (values: {
@@ -43,10 +59,15 @@ export const ProductFormWidget = (props) => {
     }) => {
         console.log("onFinish:", values);
         // Perform your submit logic here
-        await onAddProduct(values)
-        form.resetFields();
-        setIsSuccess(true); // Set success status to true
-        message.success("Product added successfully"); // Show success message
+        if(props.id===undefined) {
+            await onAddProduct(values)
+            form.resetFields();
+            message.success("Product added successfully");
+        }
+        else {
+            await onEditProduct(props.id,values)
+            message.success("Product change successfully");
+        }
     };
 
     const handleQuillChange = (value: any) => {
@@ -61,19 +82,29 @@ export const ProductFormWidget = (props) => {
         <Drawer
             open={props.isOpen}
             onClose={onCloseForm}
+            width={500} // Tăng kích thước Drawer lên 800px
+
         >
             <div style={{ display: "flex", justifyContent: "space-evenly" }}>
                 <Form
-                    form={form}
                     name="basic"
                     labelCol={{ span: 5 }}
                     wrapperCol={{ span: 20 }}
-                    style={{ maxWidth: 800, width: 500 }}
+                    style={{ maxWidth: 1000,width:600 }}
                     initialValues={{ remember: true }}
                     onFinish={onFinish}
                     onFinishFailed={onFinishFailed}
                     autoComplete="off"
-                >
+                    form={form}
+                > {props.id !== undefined ? (
+                    <Form.Item
+                        label="Product_id"
+                        name="product_id"
+
+                    >
+                        <Input disabled={true}/>
+                    </Form.Item>
+                ) : null}
                     <Form.Item
                         label="Name"
                         name="name"
@@ -87,7 +118,7 @@ export const ProductFormWidget = (props) => {
                         name="price"
                         rules={[{ required: true, message: "Please input Price!" }]}
                     >
-                        <Input />
+                        {<Input/>}
                     </Form.Item>
 
                     <Form.Item label="Sale" name="sale">
@@ -103,9 +134,16 @@ export const ProductFormWidget = (props) => {
                     </Form.Item>
 
                     <Form.Item wrapperCol={{ offset: 11, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
-                            Edit Product
-                        </Button>
+                        {props.id === undefined ? (
+                            <Button type="primary" htmlType="submit">
+                                Add Product
+                            </Button>
+                        ) : (
+                            <Button type="primary" htmlType="submit">
+                                Edit Product
+                            </Button>
+                        )}
+
                         {/*{isSuccess && <span style={{ marginLeft: 10, color: "green" }}>Add success!</span>} /!* Success message *!/*/}
                     </Form.Item>
                 </Form>
