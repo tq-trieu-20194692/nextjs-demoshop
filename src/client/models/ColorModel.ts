@@ -13,14 +13,12 @@ export type T_ColorFQ = {
 export class ColorModel extends Model{
     colorId?: string;
     name?: string;
-    edit?: string;
 
     constructor(data: Record<string, any>) {
         // this.data= data
         super(data)
         this.colorId = Normalize.initJsonString(data,"color_id")
         this.name = Normalize.initJsonString(data, "name")
-        this.edit = Normalize.initJsonString(data, "edit")
     }
     copyFrom = (data: Record<string, any>): ColorModel => {
         if (this.raw) {

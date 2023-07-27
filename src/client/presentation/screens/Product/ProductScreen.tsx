@@ -25,8 +25,6 @@ const {confirm} = Modal;
 const ProductScreen = () => {
     const navigate = useNavigate()
     const location = useLocation()
-    // const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
-    // const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
     const [currentPage, setCurrentPage] = useState<number | undefined>(1)
 
 

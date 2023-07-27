@@ -6,24 +6,29 @@ import type { ColumnsType } from 'antd/es/table';
 import { useLocation, useNavigate} from 'react-router-dom';
 import {UrlQuery} from "../../../core/UrlQuery";
 import {ColorFormWidget, T_FormProps} from "./ColorFormWidget";
-import {PlusOutlined} from "@ant-design/icons"
+import {FunnelPlotOutlined, PlusOutlined} from "@ant-design/icons"
 
 type _T_DataTable = {
     color_id?: string; // Add 'color_id' property
     name?: string;
+    model: ColorModel
 };
+
 const {Search} = Input;
 const {confirm} = Modal;
+
 const ColorScreen = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const [currentPage, setCurrentPage] = useState<number | undefined>(1)
+
+
     const {
         vm,
-        onGetColors,// lấy danh sách dữ liệu
-        onDeleteColor, // xóa dữ liệu
+        dispatchLoadItems,
+        onDeleteColor// lấy danh sách dữ liệu
     } = ColorAction()
-    //
+
     const URL = new UrlQuery(location.search)
 
     const page = URL.getInt("page")
@@ -31,6 +36,7 @@ const ColorScreen = () => {
     const sort = URL.get("sort")
     const order = URL.get("order")
     const search = URL.get("search")
+
     const [queryParams, setQueryParams] = useState<T_ColorFQ>({
         page: page,
         limit: limit,
@@ -43,7 +49,20 @@ const ColorScreen = () => {
         isOpen: false
     })
 
+    //
+    const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+    const handleFilterApply = () => {
+        //....
+
+        setIsFilterModalVisible(false); // Đóng modal sau khi bấm nút "Apply"
+    };
+    const handleFilterCancel = () => {
+        setIsFilterModalVisible(false); // Đóng modal khi bấm nút "Cancel"
+    };
+    //
     const [selectedColorName, setSelectedColorName] = useState<string | null>(null);
+    const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
+
     //
     const [ColorList, setColorList] = useState<ColorModel[]>(
         () => {
@@ -61,7 +80,9 @@ const ColorScreen = () => {
 
     useEffect(() => {
         console.log('MOUNT: Color Screen');
-        onGetColors(new UrlQuery(queryParams).toObject());
+        // onGetColors(new UrlQuery(queryParams).toObject());
+        dispatchLoadItems(new UrlQuery(queryParams).toObject())
+
         return () => {
             console.log('UNMOUNT: Color Screen');
         }
@@ -83,15 +104,30 @@ const ColorScreen = () => {
         console.log('vm.error', vm.error)
     }, [vm.error])
 
-
     const urlQueryParams = new UrlQuery(queryParams)
+    // const paginationOptions = {
+    //     pageSize: vm.query.page_item,
+    //     current: currentPage,
+    //     total: vm.query.count,
+    //     onChange: (page: number) => {
+    //         urlQueryParams.set("page", page)
+    //         onGetColors(urlQueryParams.toObject())
+    //         setQueryParams(urlQueryParams.toObject())
+    //         navigate({
+    //             search: urlQueryParams.toString()
+    //         }, {
+    //             replace: true
+    //         })
+    //     }
+    // }
     const paginationOptions = {
-        pageSize: vm.query.page_item,
-        current: currentPage,
-        total: vm.query.count,
+        pageSize: vm.oMeta?.perPage,
+        current: vm.oMeta?.currentPage,
+        total: vm.oMeta?.totalCount,
         onChange: (page: number) => {
             urlQueryParams.set("page", page)
-            onGetColors(urlQueryParams.toObject())
+            // onGetColors(urlQueryParams.toObject())
+            dispatchLoadItems(urlQueryParams.toObject())
             setQueryParams(urlQueryParams.toObject())
             navigate({
                 search: urlQueryParams.toString()
@@ -99,19 +135,22 @@ const ColorScreen = () => {
                 replace: true
             })
         }
-    };
-    const onSearch = (value: any) => {
+    }
+    const onSearch = (value: string) => {
         console.log(value)
-        if (value.length === 0) {
-            //xóa tất cả set trong urlQueryParams
-            urlQueryParams.delete("search"); // Xóa tham số 'order'
-        } else {
-            urlQueryParams.set("search", value)
-            urlQueryParams.set("page", 1)
-
+        if (value.length > 0) {
+            urlQueryParams.set("search", "name")
+            urlQueryParams.set("key", value)
+        }
+        else {
+            urlQueryParams.delete("search")
+            urlQueryParams.delete("key")
         }
 
-        onGetColors(urlQueryParams.toObject())
+        urlQueryParams.delete("page")
+
+        // onGetColors(urlQueryParams.toObject())
+        dispatchLoadItems(urlQueryParams.toObject())
         setQueryParams(urlQueryParams.toObject())
         navigate({
             search: urlQueryParams.toString()
@@ -125,14 +164,14 @@ const ColorScreen = () => {
             isOpen: true
         })
     }
-    const onOpenFormChange = (id: any) => {
-        console.log(id)
+    const onOpenFormChange = (data: ColorModel) => {
         setFormProps({
             isOpen: true,
-            colorId: id
+            colorId: data.colorId,
+            data: data
         })
-
     }
+
     const onCloseForm = () => {
         setFormProps({
             isOpen: false
@@ -165,13 +204,15 @@ const ColorScreen = () => {
             title: 'Color Name',
             dataIndex: 'name',
             key: 'name',
+            // filters: ColorList.map((item) => ({ text: item.name, value: item.name })),
+            // onFilter: (value, record) => record.data.name === value,
         },
         {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button type="primary" onClick={() => onOpenFormChange(record.color_id)}>
+                    <Button type="primary" onClick={() => onOpenFormChange(record.model)}>
                         Edit
                     </Button>
                     <Button danger onClick={() => handleDelete(record.color_id)}>
@@ -182,21 +223,34 @@ const ColorScreen = () => {
         },
     ]
 
-    const dataSource: Array<_T_DataTable> = vm.items.map((item, index) => ({
+    const dataSource: _T_DataTable[] = vm.items.map((item, index) => ({
         color_id: item.colorId, // Assign 'colorId' to 'color_id'
         name: item.name,
+        // Assuming 'status' property exists in 'ColorModel'
+        tag: item.tag,
+        description: item.description,
+        price: item.price,
         key: index.toString(),
+        model: item
     }))
 
 
     return (
         <>
+            {/*{*/}
+            {/*    selectForm && (*/}
+            {/*        <Modal title="Update color" open={isModalOpenChange} onOk={handleOk} onCancel={handleCancel}>*/}
+            {/*            <ChangeForm/>*/}
+            {/*        </Modal>*/}
+            {/*    )*/}
+            {/*}*/}
             <Row>
                 <Col span={20}>
-                    <Search placeholder="search color" onSearch={onSearch} style={{width: 200, marginBottom: '12px'}}/>
+                    <AutoComplete placeholder="search color" onSearch={onSearch} style={{width: 200, marginBottom: '12px'}}/>
                 </Col>
-                <Col span={3}>
-                    <Button  onClick={() => onOpenForm()}><PlusOutlined />Add Color</Button>
+                <Col span={3} style={{ display: 'flex', justifyContent: 'flex-end', paddingRight: '16px' }}>
+                    <Button onClick={() => setIsFilterModalVisible(true)} style={{ marginRight: '8px' }}><FunnelPlotOutlined /> </Button>
+                    <Button onClick={() => onOpenForm()}><PlusOutlined /> Add Color</Button>
                 </Col>
             </Row>
             <Table
@@ -209,8 +263,15 @@ const ColorScreen = () => {
                 isOpen={formProps.isOpen}
                 id={formProps.colorId}
                 onClose={onCloseForm}
-
+                data={formProps.data}
             />
+            <Modal
+                title="Filter Colors"
+                open={isFilterModalVisible}
+                onOk={handleFilterApply}
+                onCancel={handleFilterCancel}
+            >
+            </Modal>
         </>
     )
 }

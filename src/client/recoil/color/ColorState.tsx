@@ -2,17 +2,21 @@ import {E_SendingStatus} from "../../const/Events";
 import {ColorModel} from "../../models/ColorModel";
 import {atom} from "recoil";
 import {KeyColor} from "../KeyRecoil";
+import {PaginateMetaModel} from "../../models/ApiResModel";
 
 export type T_ColorState = {
     isLoading: E_SendingStatus,
     items: ColorModel[],
     error?: Record<string, any>,
-    query : {
+    query: {
         page: number,
         count : number,
-        page_item:number
+        page_item:number,
+        limit: number,
+        sort: string,
+        order: string
     }
-
+    oMeta?: PaginateMetaModel
 }
 
 export type T_FormState = {
@@ -27,6 +31,9 @@ export const initialState: T_ColorState = {
         page:1,
         count:1,
         page_item:10,
+        limit: 10,
+        sort: "date",
+        order: "desc"
     }
 }
 

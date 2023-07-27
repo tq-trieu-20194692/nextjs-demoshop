@@ -32,4 +32,10 @@ export class ApiService {
             return AxiosClientTest.get("admin.php", query)
         }
     }
+    color = {
+        getColor(query?: T_ColorFQ): Promise<ApiResModel> {
+            return AxiosClientTest.get("admin.php", query)
+        }
+    }
+
 }

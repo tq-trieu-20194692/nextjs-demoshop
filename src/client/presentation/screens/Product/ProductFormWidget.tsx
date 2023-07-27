@@ -12,6 +12,7 @@ export type T_FormProps = {
     onClose?: Function
     productId?: string
     data?: ProductModel
+    id?: string
 }
 
 type _T_FormFields = {
