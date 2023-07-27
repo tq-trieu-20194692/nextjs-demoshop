@@ -13,7 +13,7 @@ export class ApiResModel {
         this.data = Normalize.initJsonObject(data, 'data')
         this.error = Normalize.initJsonObject(data, 'error')
         this.items = Normalize.initJsonArray(data, 'items')
-        this.meta = Normalize.initJsonObject(data, '_meta', (item: Record<string, any>) => new PaginateMetaModel(item))
+        this.meta = Normalize.initJsonObject(data, 'meta_data', (item: Record<string, any>) => new PaginateMetaModel(item))
         this.code = Normalize.initJsonNumber(data, 'code') ?? 1
     }
 }

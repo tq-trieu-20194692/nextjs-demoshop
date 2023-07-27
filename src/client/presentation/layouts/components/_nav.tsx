@@ -1,6 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import {cilChart, cilDrop, cilSpeedometer, cilPhone} from '@coreui/icons'
+import {cilChart, cilDrop, cilSpeedometer, cilPhone, cilColorFill} from '@coreui/icons'
 import {CNavGroup, CNavItem, CNavTitle, } from '@coreui/react'
 import {RouteConfig} from "../../../config/RouteConfig";
 
@@ -62,7 +62,17 @@ const _nav: T_Nav[] = [
             color: 'info',
             text: '',
         },
-    }
+    },
+    {
+        component: CNavItem,
+        name: 'Color',
+        to: RouteConfig.COLOR,
+        icon: <CIcon icon={cilColorFill} customClassName="nav-icon"/>,
+        badge: {
+            color: 'info',
+            text: '',
+        },
+    },
 ]
 
 export default _nav

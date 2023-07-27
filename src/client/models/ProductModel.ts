@@ -10,21 +10,6 @@ export type T_ProductFQ = {
     search?: string
 }
 
-
-// export type T_ProductV0 = {
-//     name: string
-//     description: string
-//     price: string
-//     sale: string
-//     product_category: string
-//     product_attribute: string
-//     product_sale: string
-//     image: string
-//     product_color: string
-//     product_image: string
-//     status: string
-//
-// }
 export class ProductModel extends Model{
     productId?: string;
     name?: string;
@@ -33,6 +18,7 @@ export class ProductModel extends Model{
     sale: string;
     tag: string;
     address?:string
+    date: string
     // data : Record<string, any>
 
     constructor(data: Record<string, any>) {
@@ -45,6 +31,7 @@ export class ProductModel extends Model{
         this.sale = Normalize.initJsonString(data, "sale") || ""
         this.tag = Normalize.initJsonString(data, "tag") || ""
         this.address = Normalize.initJsonString(data, "address")
+        this.date = Normalize.initJsonString(data, "date") || ""
 
     }
     copyFrom = (data: Record<string, any>): ProductModel => {

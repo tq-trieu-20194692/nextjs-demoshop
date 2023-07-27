@@ -9,7 +9,7 @@ import {E_SendingStatus} from "../../../const/Events";
 import {useState} from "react";
 import axios from "axios";
 import {StoreConfig} from "../../../config/StoreConfig";
-import {AxiosClient} from "../../../repositories/AxiosClientTest";
+import {AxiosClientTest} from "../../../repositories/AxiosClientTest";
 
 export const LoginAction = () => {
     const [session, setSession] = useSessionContext()
@@ -27,7 +27,7 @@ export const LoginAction = () => {
             isLoading: E_SendingStatus.loading
         })
 
-        AxiosClient
+        AxiosClientTest
             .post("http://222.252.10.203:30100/admin.php?route=auth/login", data)
             .then(response => {
                 const user = new UserModel(response.data)

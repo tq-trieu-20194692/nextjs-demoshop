@@ -1,11 +1,12 @@
 import {ProductAction} from "../../../recoil/product/ProductAction";
 import React, {useEffect, useState} from "react";
 import {ProductModel, T_ProductFQ} from "../../../models/ProductModel";
-import {Button, Col, Input, message, Modal, Row, Space, Table} from 'antd';
+import {Button, Col, Input, message, Modal, Row, Space, Table, AutoComplete} from 'antd';
 import type {ColumnsType} from 'antd/es/table';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {UrlQuery} from "../../../core/UrlQuery";
 import {ProductFormWidget, T_FormProps} from "./ProductFormWidget";
+import {PlusOutlined, FunnelPlotOutlined} from "@ant-design/icons"
 
 type _T_DataTable = {
     product_id?: string; // Add 'product_id' property
@@ -14,6 +15,8 @@ type _T_DataTable = {
     tag?: string;
     description?: string;
     price?: string;
+    date?:string;
+    model: ProductModel
 };
 
 const {Search} = Input;
@@ -29,7 +32,7 @@ const ProductScreen = () => {
 
     const {
         vm,
-        onGetProducts,
+        dispatchLoadItems,
         onDeleteProduct// lấy danh sách dữ liệu
     } = ProductAction()
 
@@ -40,6 +43,7 @@ const ProductScreen = () => {
     const sort = URL.get("sort")
     const order = URL.get("order")
     const search = URL.get("search")
+
     const [queryParams, setQueryParams] = useState<T_ProductFQ>({
         page: page,
         limit: limit,
@@ -52,6 +56,17 @@ const ProductScreen = () => {
         isOpen: false
     })
 
+    //
+    const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+    const handleFilterApply = () => {
+        //....
+
+        setIsFilterModalVisible(false); // Đóng modal sau khi bấm nút "Apply"
+    };
+    const handleFilterCancel = () => {
+        setIsFilterModalVisible(false); // Đóng modal khi bấm nút "Cancel"
+    };
+    //
     const [selectedProductName, setSelectedProductName] = useState<string | null>(null);
     const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
 
@@ -72,7 +87,9 @@ const ProductScreen = () => {
 
     useEffect(() => {
         console.log('MOUNT: Product Screen');
-        onGetProducts(new UrlQuery(queryParams).toObject());
+        // onGetProducts(new UrlQuery(queryParams).toObject());
+        dispatchLoadItems(new UrlQuery(queryParams).toObject())
+
         return () => {
             console.log('UNMOUNT: Product Screen');
         }
@@ -94,26 +111,30 @@ const ProductScreen = () => {
         console.log('vm.error', vm.error)
     }, [vm.error])
 
-    //
-    // const onChangePage = (page: number) => {
-    //     const urlQueryParams = new UrlQuery(queryParams)
-    //     urlQueryParams.set("page", page)
-    //     onGetProducts(urlQueryParams.toObject())
-    //     setQueryParams(urlQueryParams.toObject())
-    //     navigate({
-    //         search: urlQueryParams.toString()
-    //     },{
-    //         replace: true
-    //     })
-    // }
     const urlQueryParams = new UrlQuery(queryParams)
+    // const paginationOptions = {
+    //     pageSize: vm.query.page_item,
+    //     current: currentPage,
+    //     total: vm.query.count,
+    //     onChange: (page: number) => {
+    //         urlQueryParams.set("page", page)
+    //         onGetProducts(urlQueryParams.toObject())
+    //         setQueryParams(urlQueryParams.toObject())
+    //         navigate({
+    //             search: urlQueryParams.toString()
+    //         }, {
+    //             replace: true
+    //         })
+    //     }
+    // }
     const paginationOptions = {
-        pageSize: vm.query.page_item,
-        current: currentPage,
-        total: vm.query.count,
+        pageSize: vm.oMeta?.perPage,
+        current: vm.oMeta?.currentPage,
+        total: vm.oMeta?.totalCount,
         onChange: (page: number) => {
             urlQueryParams.set("page", page)
-            onGetProducts(urlQueryParams.toObject())
+            // onGetProducts(urlQueryParams.toObject())
+            dispatchLoadItems(urlQueryParams.toObject())
             setQueryParams(urlQueryParams.toObject())
             navigate({
                 search: urlQueryParams.toString()
@@ -121,19 +142,22 @@ const ProductScreen = () => {
                 replace: true
             })
         }
-    };
-    const onSearch = (value: any) => {
+    }
+    const onSearch = (value: string) => {
         console.log(value)
-        if (value.length === 0) {
-            //xóa tất cả set trong urlQueryParams
-            urlQueryParams.delete("search"); // Xóa tham số 'order'
-        } else {
-            urlQueryParams.set("search", value)
-            urlQueryParams.set("page", 1)
-
+        if (value.length > 0) {
+            urlQueryParams.set("search", "name")
+            urlQueryParams.set("key", value)
+        }
+        else {
+            urlQueryParams.delete("search")
+            urlQueryParams.delete("key")
         }
 
-        onGetProducts(urlQueryParams.toObject())
+        urlQueryParams.delete("page")
+
+        // onGetProducts(urlQueryParams.toObject())
+        dispatchLoadItems(urlQueryParams.toObject())
         setQueryParams(urlQueryParams.toObject())
         navigate({
             search: urlQueryParams.toString()
@@ -147,14 +171,14 @@ const ProductScreen = () => {
             isOpen: true
         })
     }
-    const onOpenFormChange = (id: any) => {
-        console.log(id)
+    const onOpenFormChange = (data: ProductModel) => {
         setFormProps({
             isOpen: true,
-            productId: id
+            productId: data.productId,
+            data: data
         })
-
     }
+
     const onCloseForm = () => {
         setFormProps({
             isOpen: false
@@ -206,7 +230,7 @@ const ProductScreen = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button type="primary" onClick={() => onOpenFormChange(record.product_id)}>
+                    <Button type="primary" onClick={() => onOpenFormChange(record.model)}>
                         Edit
                     </Button>
                     <Button danger onClick={() => handleDelete(record.product_id)}>
@@ -217,7 +241,7 @@ const ProductScreen = () => {
         },
     ]
 
-    const dataSource: Array<_T_DataTable> = vm.items.map((item, index) => ({
+    const dataSource: _T_DataTable[] = vm.items.map((item, index) => ({
         product_id: item.productId, // Assign 'productId' to 'product_id'
         name: item.name,
         // Assuming 'status' property exists in 'ProductModel'
@@ -225,6 +249,7 @@ const ProductScreen = () => {
         description: item.description,
         price: item.price,
         key: index.toString(),
+        model: item
     }))
 
 
@@ -239,10 +264,11 @@ const ProductScreen = () => {
             {/*}*/}
             <Row>
                 <Col span={20}>
-                    <Search placeholder="search product" onSearch={onSearch} style={{width: 200, marginBottom: '12px'}}/>
+                    <AutoComplete placeholder="search product" onSearch={onSearch} style={{width: 200, marginBottom: '12px'}}/>
                 </Col>
-                <Col span={3}>
-                    <Button onClick={() => onOpenForm()}>Add Product</Button>
+                <Col span={3} style={{ display: 'flex', justifyContent: 'flex-end', paddingRight: '16px' }}>
+                    <Button onClick={() => setIsFilterModalVisible(true)} style={{ marginRight: '8px' }}><FunnelPlotOutlined /> </Button>
+                    <Button onClick={() => onOpenForm()}><PlusOutlined /> Add Product</Button>
                 </Col>
             </Row>
             <Table
@@ -255,8 +281,15 @@ const ProductScreen = () => {
                 isOpen={formProps.isOpen}
                 id={formProps.productId}
                 onClose={onCloseForm}
-
+                data={formProps.data}
             />
+            <Modal
+                title="Filter Products"
+                open={isFilterModalVisible}
+                onOk={handleFilterApply}
+                onCancel={handleFilterCancel}
+            >
+            </Modal>
         </>
     )
 }

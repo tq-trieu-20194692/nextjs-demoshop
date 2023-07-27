@@ -3,6 +3,8 @@ import {ApiResModel} from "../models/ApiResModel";
 import {injectable} from "inversify";
 import {T_LoginVO} from "../models/UserModel";
 import {App} from "../const/App"
+import {T_ProductFQ} from "../models/ProductModel";
+import {AxiosClientTest} from "./AxiosClientTest";
 @injectable()
 export class ApiService {
     init(): Promise<ApiResModel> {
@@ -23,5 +25,11 @@ export class ApiService {
 
     getMe(): Promise<ApiResModel> {
         return AxiosClient.get("account/me")
+    }
+
+    product = {
+        getProduct(query?: T_ProductFQ): Promise<ApiResModel> {
+            return AxiosClientTest.get("admin.php", query)
+        }
     }
 }
